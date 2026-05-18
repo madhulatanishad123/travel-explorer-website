@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About Us</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: url('https://images.unsplash.com/photo-1501785888041-af3ef285b470') no-repeat center center/cover;
+            min-height: 100vh;
+        }
+
+        nav {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            color: #ffd700;
+        }
+
+        .content {
+            text-align: center;
+            color:black;
+            padding: 100px 20px;
+            margin: 80px auto;
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .content h1 {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .content p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>Sneha Travel Explore</h2>
+    <ul>
+        <!-- Navigation filled by nav.js -->
+    </ul>
+</nav>
+
+<script src="nav.js"></script>
+
+<section class="content">
+    <h1>About Travel Explore</h1>
+    <p>We help travelers discover beautiful destinations around the world.</p>
+</section>
+
+</body>
+</html>

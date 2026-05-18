@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Sneha Travel Explore</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-container h1 {
+            text-align: center;
+            color: #0077b6;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0077b6;
+            box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: #0077b6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #005a8d;
+        }
+
+        .auth-links {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .auth-links a {
+            color: #0077b6;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .auth-links a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>Sneha Travel Explore</h2>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="package.html">Package</a></li>
+        <li><a href="blog.html">Blog</a></li>
+    </ul>
+</nav>
+
+<div class="auth-container">
+    <h1>Login</h1>
+    <div id="message" class="message"></div>
+    
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn-login">Login</button>
+    </form>
+
+    <div class="auth-links">
+        <span>Don't have an account? <a href="register.html">Register here</a></span>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const API_URL = "http://localhost:8000";
+
+    $("#loginForm").on("submit", function(e) {
+        e.preventDefault();
+
+        const username = $("#username").val();
+        const password = $("#password").val();
+        const messageDiv = $("#message");
+
+        $.ajax({
+            url: `${API_URL}/login`,
+            type: "POST",
+            data: {
+                username: username,
+                password: password
+            },
+            success: function(data) {
+                messageDiv.text("Login successful! Redirecting...");
+                messageDiv.removeClass("error").addClass("message success").show();
+                localStorage.setItem("username", username);
+                localStorage.setItem("email", data.email);
+                setTimeout(() => {
+                    window.location.href = "booking.html";
+                }, 2000);
+            },
+            error: function(xhr) {
+                const data = xhr.responseJSON || {};
+                messageDiv.text(data.detail || "Login failed");
+                messageDiv.removeClass("success").addClass("message error").show();
+                console.error("Error:", xhr);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

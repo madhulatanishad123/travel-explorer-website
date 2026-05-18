@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Explore - RM Tour Explorer</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Fixed Background Loopable 3D Earth Video -->
+<video id="globe-bg" autoplay loop muted playsinline>
+    <source src="images/earth.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+<!-- Dynamic Color shifting space overlay -->
+<div id="video-overlay"></div>
+
+<nav>
+    <h2>RM Tour Explorer</h2>
+    <ul>
+        <!-- Navigation filled by nav.js -->
+    </ul>
+</nav>
+
+<header class="hero">
+    <div class="hero-glass-card">
+        <span class="hero-badge">Adventure Awaits</span>
+        <h1>Explore The World</h1>
+        <p>Embark on customized tours, luxury cruises, and spectacular journeys around the globe. Your next adventure starts here.</p>
+        <div class="hero-actions">
+            <button class="btn-primary" onclick="gotopage()">Start Journey</button>
+            <button class="btn-secondary" onclick="scrollToContent()">Explore More</button>
+        </div>
+    </div>
+</header>             
+
+<script src="script.js"></script>
+<script src="nav.js"></script>
+
+</body>
+</html>

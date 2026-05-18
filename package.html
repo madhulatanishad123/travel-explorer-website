@@ -1,0 +1,428 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Packages Slider</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover;
+}
+
+/* Dark overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: -1;
+}
+
+/* Slider Section */
+.slider {
+    width: 100%;
+    overflow: hidden;
+    padding: 80px 0;
+}
+
+/* Slide Track */
+.slide-track {
+    display: flex;
+    gap: 30px;
+    width: calc(280px * 12);
+    animation: scroll 35s linear infinite;
+}
+
+/* Card Design */
+.card {
+    position: relative;
+    width: 280px;
+    height: 380px;
+    border-radius: 20px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+}
+
+/* Gradient Overlay */
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%);
+}
+
+/* Card Content */
+.card-content {
+    position: relative;
+    color: #fff;
+    padding: 20px;
+    width: 100%;
+}
+
+.card-content h2 {
+    margin: 0 0 10px;
+    font-size: 22px;
+}
+
+.price {
+    margin-bottom: 15px;
+    font-weight: bold;
+    font-size: 18px;
+    color: #ffeb3b;
+}
+
+/* Button */
+.book-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #ff5722, #ff8a50);
+    color: #fff;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.book-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 20px rgba(255,87,34,0.6);
+}
+
+/* Auto Scroll Animation */
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card {
+        width: 220px;
+        height: 320px;
+    }
+}
+
+/* Search & Filter Styles */
+.search-container {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.search-container input, .search-container select {
+    padding: 12px 20px;
+    border-radius: 30px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    min-width: 200px;
+}
+
+.search-container label {
+    color: white;
+    font-weight: 600;
+}
+
+#resultsGrid {
+    display: none;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+#resultsGrid .card {
+    animation: fadeIn 0.5s ease;
+}
+
+.category-tag {
+    font-size: 0.8rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h2 style="color: white; margin: 20px; position: absolute; z-index: 10;">Sneha Travel Explore</h2>
+    <ul id="navLinks" style="display: flex; gap: 20px; list-style: none; position: absolute; top: 20px; right: 20px; z-index: 10;">
+        <!-- Filled by nav.js -->
+    </ul>
+</nav>
+
+<style>
+    /* Add some styles for the nav on this page since it's unique */
+    #navLinks a { color: white; text-decoration: none; font-weight: 600; }
+    #navLinks a:hover { color: #ffeb3b; }
+</style>
+
+<div class="slider-wrapper">
+    <div class="search-container">
+        <div class="filter-group">
+            <input type="text" id="destSearch" placeholder="Search destination (e.g. Hampi)...">
+        </div>
+        <div class="filter-group">
+            <select id="categoryFilter">
+                <option value="All">All Categories</option>
+                <option value="National">National</option>
+                <option value="International">International</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="priceFilter" style="color: white; margin-right: 10px;">Max Price:</label>
+            <select id="priceFilter">
+                <option value="100000">All Prices</option>
+                <option value="10000">Under ₹10,000</option>
+                <option value="20000">Under ₹20,000</option>
+                <option value="50000">Under ₹50,000</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="slider" id="mainSlider">
+        <div class="slide-track" id="slideTrack">
+            <!-- Cards will be dynamically filled to support categorization better -->
+        </div>
+    </div>
+
+    <div id="resultsGrid"></div>
+
+    <div class="section-title" style="margin-top: 80px;">
+        <h2 style="color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">Explore Destinations on Map</h2>
+        <p style="color: #eee;">Visualize your next adventure</p>
+    </div>
+    <div id="map" style="height: 450px; width: 90%; max-width: 1100px; margin: 30px auto 80px; border-radius: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); position: relative; z-index: 1; border: 2px solid rgba(255,255,255,0.1);"></div>
+
+    <script src="nav.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        renderSlider();
+        fetchFavorites();
+    });
+
+    const API_URL = "http://localhost:8000";
+
+    const allDestinations = [
+        // National
+        { name: "Bangalore", price: 7999, category: "National", img: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=800&q=80", coords: [12.9716, 77.5946] },
+        { name: "Mysuru", price: 8499, category: "National", img: "https://www.mysoretourism.org.in/images/places-to-visit/mysore-weather-best-time-header-mysore-tourism.jpg.jpg", coords: [12.2958, 76.6394] },
+        { name: "Shivamogga", price: 7299, category: "National", img: "https://images.unsplash.com/photo-1590766940554-634a7ed41450?auto=format&fit=crop&w=800&q=80", coords: [13.9299, 75.5681] },
+        { name: "Hampi", price: 9999, category: "National", img: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?auto=format&fit=crop&w=800&q=80", coords: [15.3350, 76.4600] },
+        { name: "Ooty", price: 11499, category: "National", img: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80", coords: [11.4102, 76.6950] },
+        { name: "Goa", price: 12999, category: "National", img: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=800&q=80", coords: [15.2993, 74.1240] },
+        { name: "Coorg", price: 8999, category: "National", img: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=800&q=80", coords: [12.3375, 75.8069] },
+        { name: "Munnar", price: 10499, category: "National", img: "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?auto=format&fit=crop&w=800&q=80", coords: [10.0889, 77.0595] },
+        { name: "Leh Ladakh", price: 24999, category: "National", img: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?auto=format&fit=crop&w=800&q=80", coords: [34.1526, 77.5771] },
+        { name: "Varanasi", price: 6999, category: "National", img: "https://images.unsplash.com/photo-1561359313-0639aad49ca6?auto=format&fit=crop&w=800&q=80", coords: [25.3176, 82.9739] },
+        { name: "Kerala Backwaters", price: 15000, category: "National", img: "https://images.unsplash.com/photo-1593181629936-11c609b8db9b?auto=format&fit=crop&w=800&q=80", coords: [9.4981, 76.3388] },
+        { name: "Jaipur", price: 12000, category: "National", img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=800&q=80", coords: [26.9124, 75.7873] },
+        { name: "Agra", price: 9000, category: "National", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=800&q=80", coords: [27.1751, 78.0421] },
+        { name: "Manali", price: 18000, category: "National", img: "https://images.unsplash.com/photo-1591154669695-5f2a8d20c089?auto=format&fit=crop&w=800&q=80", coords: [32.2432, 77.1892] },
+        { name: "Rishikesh", price: 7000, category: "National", img: "https://images.unsplash.com/photo-1598977123418-4545530dad8f?auto=format&fit=crop&w=800&q=80", coords: [30.0869, 78.2676] },
+        
+        // International
+        { name: "Dubai", price: 45000, category: "International", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=800&q=80", coords: [25.2048, 55.2708] },
+        { name: "Paris", price: 85000, category: "International", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80", coords: [48.8566, 2.3522] },
+        { name: "Bali", price: 35000, category: "International", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=800&q=80", coords: [-8.4095, 115.1889] },
+        { name: "Singapore", price: 42000, category: "International", img: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=800&q=80", coords: [1.3521, 103.8198] },
+        { name: "Maldives", price: 55000, category: "International", img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=800&q=80", coords: [3.2028, 73.2207] },
+        { name: "Switzerland", price: 120000, category: "International", img: "https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=80", coords: [46.8182, 8.2275] },
+        { name: "London", price: 95000, category: "International", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=800&q=80", coords: [51.5074, -0.1278] },
+        { name: "New York", price: 150000, category: "International", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=800&q=80", coords: [40.7128, -74.0060] },
+        { name: "Tokyo", price: 80000, category: "International", img: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80", coords: [35.6762, 139.6503] },
+        { name: "Sydney", price: 110000, category: "International", img: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=800&q=80", coords: [-33.8688, 151.2093] },
+        { name: "Rome", price: 88000, category: "International", img: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=800&q=80", coords: [41.9028, 12.4964] },
+        { name: "Bangkok", price: 30000, category: "International", img: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=800&q=80", coords: [13.7563, 100.5018] },
+        { name: "Cape Town", price: 125000, category: "International", img: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?auto=format&fit=crop&w=800&q=80", coords: [-33.9249, 18.4241] },
+        { name: "Santorini", price: 115000, category: "International", img: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=800&q=80", coords: [36.3932, 25.4615] },
+        { name: "Cairo", price: 75000, category: "International", img: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?auto=format&fit=crop&w=800&q=80", coords: [30.0444, 31.2357] },
+        { name: "Istanbul", price: 65000, category: "International", img: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=800&q=80", coords: [41.0082, 28.9784] }
+    ];
+
+    async function fetchFavorites() {
+        const username = localStorage.getItem('username');
+        if (!username) return;
+        
+        try {
+            const response = await fetch(`${API_URL}/favorites/${username}`);
+            const data = await response.json();
+            const favorites = data.favorites || [];
+            
+            document.querySelectorAll('.heart-icon').forEach(icon => {
+                const dest = icon.getAttribute('data-dest');
+                if (favorites.includes(dest)) {
+                    icon.classList.add('active');
+                }
+            });
+        } catch (err) {
+            console.error("Error fetching favorites:", err);
+        }
+    }
+
+    async function toggleFavorite(event, destination) {
+        event.stopPropagation();
+        const username = localStorage.getItem('username');
+        if (!username) {
+            alert("Please login to save favorites!");
+            return;
+        }
+        
+        const icon = event.currentTarget;
+        const isActive = icon.classList.contains('active');
+        const url = isActive ? `${API_URL}/favorite-remove` : `${API_URL}/favorite`;
+        
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, destination })
+            });
+            
+            if (response.ok) {
+                icon.classList.toggle('active');
+            }
+        } catch (err) {
+            console.error("Error toggling favorite:", err);
+        }
+    }
+
+    function bookNow(destination) {
+        const username = localStorage.getItem("username");
+        if (!username) {
+            alert("Please login first to book a trip!");
+            window.location.href = "login.html";
+            return;
+        }
+        window.location.href = `booking.html?destination=${destination}`;
+    }
+
+    function renderSlider() {
+        const slideTrack = document.getElementById('slideTrack');
+        const sliderContent = allDestinations.slice(0, 8).map(d => `
+            <div class="card" style="background-image: url('${d.img}');" onclick="bookNow('${d.name}')">
+                <span class="heart-icon" data-dest="${d.name}" onclick="toggleFavorite(event, '${d.name}')">❤</span>
+                <div class="card-content">
+                    <h2>${d.name}</h2>
+                    <div class="price">From ₹${d.price.toLocaleString()}</div>
+                    <button class="book-btn">Book Now</button>
+                </div>
+            </div>
+        `).join("");
+        
+        slideTrack.innerHTML = sliderContent + sliderContent; // Duplicate for infinite scroll
+    }
+
+    const destSearch = document.getElementById('destSearch');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const priceFilter = document.getElementById('priceFilter');
+    const mainSlider = document.getElementById('mainSlider');
+    const resultsGrid = document.getElementById('resultsGrid');
+
+    function updateFilters() {
+        const query = destSearch.value.toLowerCase();
+        const category = categoryFilter.value;
+        const maxPrice = parseInt(priceFilter.value);
+        
+        if (query === "" && category === "All" && maxPrice >= 100000) {
+            mainSlider.style.display = "block";
+            resultsGrid.style.display = "none";
+            return;
+        }
+
+        const filtered = allDestinations.filter(d => 
+            d.name.toLowerCase().includes(query) && 
+            (category === "All" || d.category === category) &&
+            d.price <= maxPrice
+        );
+
+        renderResults(filtered);
+    }
+
+    function renderResults(results) {
+        mainSlider.style.display = "none";
+        resultsGrid.style.display = "grid";
+        
+        if (results.length === 0) {
+            resultsGrid.innerHTML = `<h2 style="color: white; grid-column: 1/-1; text-align: center;">No destinations found matching your criteria.</h2>`;
+            return;
+        }
+
+        resultsGrid.innerHTML = results.map(d => `
+            <div class="card" style="background-image: url('${d.img}');">
+                <span class="heart-icon" data-dest="${d.name}" onclick="toggleFavorite(event, '${d.name}')">❤</span>
+                <div class="card-content">
+                    <h2>${d.name}</h2>
+                    <div class="category-tag" style="font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 5px;">${d.category}</div>
+                    <div class="price">From ₹${d.price.toLocaleString()}</div>
+                    <button class="book-btn" onclick="bookNow('${d.name}')">Book Now</button>
+                </div>
+            </div>
+        `).join("");
+        
+        fetchFavorites();
+    }
+
+    destSearch.addEventListener('input', updateFilters);
+    categoryFilter.addEventListener('change', updateFilters);
+    priceFilter.addEventListener('change', updateFilters);
+    </script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    // Initialize Map for Packages Page
+    var map = L.map('map').setView([20, 77], 4); // Adjusted view for international coverage
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    allDestinations.forEach(function(loc) {
+        L.marker(loc.coords).addTo(map)
+            .bindPopup("<b>" + loc.name + " (" + loc.category + ")</b><br><button onclick=\"bookNow('" + loc.name + "')\" style='margin-top:5px; padding:5px 10px; font-size:12px; background:#ff5722; color:white; border:none; border-radius:5px; cursor:pointer;'>Book Now</button>");
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trip Booking Form</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* BACKGROUND */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: url('https://images.unsplash.com/photo-1508780709619-79562169bc64?auto=format&fit=crop&w=1600&q=80') no-repeat center center/cover fixed;
+    padding-top: 100px;
+    padding-bottom: 40px;
+}
+
+/* DARK OVERLAY */
+body::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* FORM CONTAINER */
+.content {
+    position: relative;
+    z-index: 2;
+    width: 380px;
+    padding: 40px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    text-align: center;
+    color: white;
+}
+
+.content h1 {
+    margin-bottom: 20px;
+}
+
+.content input,
+.content textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+}
+
+.content textarea {
+    resize: none;
+    height: 70px;
+}
+
+/* BUTTON */
+.content button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #4CAF50;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.content button:hover {
+    background: #45a049;
+}
+
+#formMessage {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.hidden-field {
+    display: none !important;
+}
+
+#map { 
+    height: 400px; 
+    width: 90%; 
+    max-width: 800px; 
+    margin-top: 40px; 
+    border-radius: 15px; 
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4); 
+    position: relative;
+    z-index: 1;
+}
+
+.map-title {
+    margin-top: 50px;
+    color: white;
+    position: relative;
+    z-index: 2;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+</style>
+</head>
+
+<body>
+
+<nav>
+    <h2>Sneha Travel Explore</h2>
+    <ul>
+        <!-- Navigation filled by nav.js -->
+    </ul>
+</nav>
+
+<section class="content">
+    <h1>Inquiry & Booking</h1>
+    <form id="enquiryForm">
+        <input type="text" placeholder="Username" id="username" required>
+        <input type="text" placeholder="Address" id="address" required>
+        <select id="place" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; outline: none; font-size: 14px; background: white; color: #333;">
+            <option value="">Select Place</option>
+            <option value="Bangalore">Bangalore</option>
+            <option value="Mysuru">Mysuru</option>
+            <option value="Shivamogga">Shivamogga</option>
+            <option value="Hampi">Hampi</option>
+            <option value="Ooty">Ooty</option>
+            <option value="Nagarhole">Nagarhole</option>
+        </select>
+        <select id="tripPackage" required style="width: 100%; padding: 12px; margin: 8px 0; border: none; border-radius: 8px; outline: none; font-size: 14px; background: white; color: #333;">
+            <option value="">Select Package Type</option>
+            <option value="Budget">Budget</option>
+            <option value="Standard">Standard</option>
+            <option value="Premium">Premium</option>
+            <option value="VIP">VIP</option>
+        </select>
+        <textarea placeholder="Message" id="message" required></textarea>
+        <button type="submit">Submit Enquiry</button>
+    </form>
+    <p id="formMessage"></p>
+</section>
+
+<h2 class="map-title">Our Destinations</h2>
+<div id="map"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="nav.js"></script>
+<script>
+$(document).ready(function() {
+    // Pre-fill username if logged in and hide the field
+    const loggedInUser = localStorage.getItem("username");
+    if (loggedInUser) {
+        $("#username").val(loggedInUser).hide();
+        $("label[for='username']").hide(); // Hide label if exists
+    }
+
+    const API_URL = "http://localhost:8000";
+    const form = $('#enquiryForm');
+    const messageDiv = $('#formMessage');
+
+    form.on('submit', function(e) {
+        e.preventDefault();
+
+        const data = {
+            username: $('#username').val(),
+            address: $('#address').val(),
+            place: $('#place').val(),
+            tripPackage: $('#tripPackage').val(),
+            message: $('#message').val()
+        };
+
+        $.ajax({
+            url: `${API_URL}/enquiry`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function(response) {
+                messageDiv.css("color", "#00ff99");
+                messageDiv.text("Thank you! Your enquiry has been submitted successfully.");
+                alert("Enquiry Submitted!");
+                form[0].reset();
+                if (loggedInUser) {
+                    window.location.href = "booking.html";
+                }
+            },
+            error: function(xhr) {
+                messageDiv.css("color", "#ff4d4d");
+                messageDiv.text("Error submitting enquiry. Please try again.");
+                console.error("Error:", xhr);
+            }
+        });
+    });
+});
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    // Initialize Map
+    var map = L.map('map').setView([13.5, 76.5], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    var locations = [
+        { name: "Bangalore", coords: [12.9716, 77.5946] },
+        { name: "Mysuru", coords: [12.2958, 76.6394] },
+        { name: "Shivamogga", coords: [13.9299, 75.5681] },
+        { name: "Hampi", coords: [15.3350, 76.4600] },
+        { name: "Ooty", coords: [11.4102, 76.6950] },
+        { name: "Nagarhole", coords: [12.0460, 76.1554] }
+    ];
+
+    locations.forEach(function(loc) {
+        L.marker(loc.coords).addTo(map)
+            .bindPopup("<b>" + loc.name + "</b><br>Sneha Travel Destination.");
+    });
+</script>
+
+</body>
+</html>

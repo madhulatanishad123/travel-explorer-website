@@ -1,0 +1,545 @@
+:root {
+    --bg-color: #ffffff;
+    --text-color: #333333;
+    --primary-color: #0077b6;
+    --secondary-color: #f7f8fb;
+    --card-bg: #ffffff;
+    --nav-bg: rgba(10, 15, 30, 0.35);
+    --shadow: rgba(0,0,0,0.1);
+    --nav-text: #ffffff;
+}
+
+[data-theme="dark"] {
+    --bg-color: #0a0a0c;
+    --text-color: #e2e8f0;
+    --primary-color: #00b4d8;
+    --secondary-color: #121215;
+    --card-bg: #18181f;
+    --nav-bg: rgba(5, 5, 10, 0.65);
+    --shadow: rgba(0,0,0,0.5);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1, h2, h3, h4, h5, h6, .hero-badge, .btn-primary, .btn-secondary {
+    font-family: 'Outfit', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    overflow-x: hidden;
+}
+
+/* 3D Globe Fixed Background styling */
+#globe-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh !important;
+    object-fit: cover; /* Ensure full viewport cover without distortion */
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none; /* Clicks pass through the video background */
+}
+
+/* Dynamic Color shifting cosmic space overlay */
+#video-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: -1; /* Layered exactly between video background (-2) and hero overlays (0+) */
+    background: linear-gradient(135deg, rgba(0, 180, 216, 0.15) 0%, rgba(114, 9, 183, 0.18) 50%, rgba(0, 150, 199, 0.15) 100%);
+    mix-blend-mode: screen; /* Blends beautiful glowing neon shades on top of space stars */
+    pointer-events: none;
+    animation: dynamicNebula 25s infinite linear;
+}
+
+[data-theme="dark"] #video-overlay {
+    background: linear-gradient(135deg, rgba(0, 150, 199, 0.22) 0%, rgba(114, 9, 183, 0.25) 50%, rgba(3, 4, 94, 0.2) 100%);
+}
+
+@keyframes dynamicNebula {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}
+
+nav {
+    background: var(--nav-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--nav-text);
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed; /* Make it float smoothly over the background */
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+[data-theme="dark"] nav {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+nav h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    background: linear-gradient(135deg, #ffffff 40%, #90e0ef 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+nav a {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.2s, text-shadow 0.2s;
+}
+
+nav a:hover {
+    color: #90e0ef;
+    text-shadow: 0 0 10px rgba(144, 224, 239, 0.4);
+    text-decoration: none;
+}
+
+.hero {
+    height: 100vh;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    pointer-events: none; /* Let pointer events pass through to rotate the globe background */
+    position: relative;
+    background: transparent !important;
+}
+
+/* Glassmorphism Hero Overlay card */
+.hero-glass-card {
+    pointer-events: auto; /* Re-enable pointer events inside the hero content */
+    max-width: 650px;
+    padding: 40px 50px;
+    background: rgba(10, 15, 30, 0.3);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+[data-theme="dark"] .hero-glass-card {
+    background: rgba(5, 5, 10, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.hero-badge {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #00b4d8;
+    background: rgba(0, 180, 216, 0.12);
+    padding: 6px 16px;
+    border-radius: 100px;
+    border: 1px solid rgba(0, 180, 216, 0.2);
+    display: inline-block;
+    animation: pulseGlow 3s infinite ease-in-out;
+}
+
+.hero-glass-card h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #ffffff;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin: 0;
+}
+
+.hero-glass-card p {
+    font-size: 1.08rem;
+    font-weight: 300;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 10px 0;
+    max-width: 520px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 13px 26px;
+    background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 119, 182, 0.35);
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(0, 119, 182, 0.45);
+    filter: brightness(1.1);
+}
+
+.btn-secondary {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    padding: 13px 26px;
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    transition: transform 0.2s, background-color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(0, 180, 216, 0);
+    }
+    50% {
+        box-shadow: 0 0 12px 2px rgba(0, 180, 216, 0.3);
+    }
+}
+
+.gallery {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px;
+}
+
+.card {
+    width: 250px;
+    box-shadow: 0 5px 15px var(--shadow);
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    background-color: var(--card-bg);
+    position: relative;
+}
+
+.card img {
+    width: 100%;
+    height:180px;
+    object-fit: cover;
+}
+
+.content {
+    padding: 40px;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: auto;
+    gap: 15px;
+}
+
+input, textarea {
+    padding: 10px;
+}
+
+button {
+    padding: 10px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: filter 0.3s;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--nav-text);
+    color: var(--nav-text);
+    padding: 5px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/* Wishlist Heart Icon */
+.heart-icon {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.3s, transform 0.3s;
+    text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.heart-icon.active {
+    color: #ff4757;
+    transform: scale(1.2);
+}
+
+.blog-section {
+    padding: 60px 40px;
+    background: var(--secondary-color);
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-title h2 {
+    font-size: 2.4rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.section-title p {
+    color: #555;
+    line-height: 1.8;
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 28px;
+}
+
+.blog-card {
+    background: var(--card-bg);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 45px var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 24px 55px rgba(0, 0, 0, 0.12);
+}
+
+.blog-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: cover;
+}
+
+.blog-card-content {
+    padding: 24px;
+}
+
+.blog-card-content h3 {
+    margin-bottom: 14px;
+    color: var(--text-color);
+}
+
+.blog-card-content p {
+    color: #555;
+    line-height: 1.8;
+    margin-bottom: 18px;
+}
+
+.blog-card-content a {
+    color: #0077b6;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.blog-highlight {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 22px;
+    margin-top: 40px;
+}
+
+.tip {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 16px 30px var(--shadow);
+}
+
+.tip h4 {
+    margin-bottom: 12px;
+    color: var(--primary-color);
+}
+
+.tip p {
+    color: #444;
+    line-height: 1.75;
+}
+
+/* Globe Exploration Mode Layout and Styling */
+.exploration-overlay {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    width: 90%;
+    max-width: 750px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 10;
+}
+
+.hero.exploration-active .exploration-overlay {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.hero.exploration-active .hero-glass-card {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.9);
+    pointer-events: none;
+}
+
+.btn-close-explore {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 22px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 30px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.btn-close-explore:hover {
+    background: rgba(239, 68, 68, 0.35);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(239, 68, 68, 0.2);
+}
+
+.btn-close-explore:active {
+    transform: translateY(0);
+}
+
+.explore-destinations {
+    background: rgba(10, 15, 30, 0.4);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 14px 22px;
+    border-radius: 20px;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    max-width: 100%;
+    scrollbar-width: none;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+}
+
+.explore-destinations::-webkit-scrollbar {
+    display: none;
+}
+
+.explore-destinations button {
+    font-family: 'Outfit', sans-serif;
+    white-space: nowrap;
+    padding: 11px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.explore-destinations button:hover {
+    background: rgba(0, 180, 216, 0.18);
+    border-color: rgba(0, 180, 216, 0.4);
+    color: #00b4d8;
+    transform: translateY(-2px);
+}
+
+.explore-destinations button.active {
+    background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+    border-color: transparent;
+    color: #ffffff;
+    box-shadow: 0 8px 20px rgba(0, 180, 216, 0.4);
+}
+

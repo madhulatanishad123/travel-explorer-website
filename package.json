@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "ajax": "^0.0.4"
+  },
+  "name": "sneha",
+  "version": "1.0.0",
+  "main": "script.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

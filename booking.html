@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Booking | Sneha Travel Explore</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .booking-container {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 40px;
+        }
+
+        .booking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .booking-header h1 {
+            color: #0077b6;
+            font-size: 2.5rem;
+        }
+
+        .user-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .booking-form, .my-bookings {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-form h2, .my-bookings h2 {
+            color: #0077b6;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #0077b6;
+            box-shadow: 0 0 5px rgba(0, 119, 182, 0.3);
+        }
+
+        .btn-book {
+            width: 100%;
+            padding: 12px;
+            background: #0077b6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-book:hover {
+            background: #005a8d;
+        }
+
+        .booking-card {
+            background: #f7f8fb;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #0077b6;
+        }
+
+        .booking-card h4 {
+            color: #0077b6;
+            margin-bottom: 10px;
+        }
+
+        .booking-details {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block;
+        }
+
+        .logout-btn {
+            background: #6c757d;
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            float: right;
+        }
+
+        .logout-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>Sneha Travel Explore</h2>
+    <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="gallery.html">Gallery</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="package.html">Package</a></li>
+        <li><a href="blog.html">Blog</a></li>
+    </ul>
+</nav>
+
+<div class="booking-container">
+    <div class="booking-header">
+        <h1>Booking Dashboard</h1>
+    </div>
+
+    <div class="user-info">
+        <p>Welcome, <strong id="userName">Guest</strong>! <span id="userEmail"></span></p>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <div class="two-column">
+        <div class="booking-form">
+            <h2>Book Your Trip</h2>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="destination">Destination</label>
+                    <select id="destination" name="destination" required>
+                        <option value="">Select Destination</option>
+                        <optgroup label="National">
+                            <option value="Bangalore">Bangalore</option>
+                            <option value="Mysuru">Mysuru</option>
+                            <option value="Shivamogga">Shivamogga</option>
+                            <option value="Hampi">Hampi</option>
+                            <option value="Ooty">Ooty</option>
+                            <option value="Nagarhole">Nagarhole</option>
+                            <option value="Goa">Goa</option>
+                            <option value="Coorg">Coorg</option>
+                            <option value="Munnar">Munnar</option>
+                            <option value="Leh Ladakh">Leh Ladakh</option>
+                            <option value="Varanasi">Varanasi</option>
+                            <option value="Kerala Backwaters">Kerala Backwaters</option>
+                            <option value="Jaipur">Jaipur</option>
+                            <option value="Agra">Agra</option>
+                            <option value="Manali">Manali</option>
+                            <option value="Rishikesh">Rishikesh</option>
+                        </optgroup>
+                        <optgroup label="International">
+                            <option value="Dubai">Dubai</option>
+                            <option value="Paris">Paris</option>
+                            <option value="Bali">Bali</option>
+                            <option value="Singapore">Singapore</option>
+                            <option value="Maldives">Maldives</option>
+                            <option value="Switzerland">Switzerland</option>
+                            <option value="London">London</option>
+                            <option value="New York">New York</option>
+                            <option value="Tokyo">Tokyo</option>
+                            <option value="Sydney">Sydney</option>
+                            <option value="Rome">Rome</option>
+                            <option value="Bangkok">Bangkok</option>
+                            <option value="Cape Town">Cape Town</option>
+                            <option value="Santorini">Santorini</option>
+                            <option value="Cairo">Cairo</option>
+                            <option value="Istanbul">Istanbul</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="numPeople">Number of People</label>
+                    <input type="number" id="numPeople" name="numPeople" min="1" max="10" value="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="packageType">Package Type</label>
+                    <select id="packageType" name="packageType" required>
+                        <option value="">Select Package</option>
+                        <option value="Budget">Budget - ₹5,000</option>
+                        <option value="Standard">Standard - ₹10,000</option>
+                        <option value="Premium">Premium - ₹20,000</option>
+                        <option value="VIP">VIP - ₹50,000</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <div id="payCash" class="pay-option active" onclick="selectPayment('Cash')" style="flex: 1; padding: 15px; border: 2px solid #0077b6; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                            <span style="font-size: 1.5rem; display: block;">💵</span>
+                            <strong>Cash on Arrival</strong>
+                        </div>
+                        <div id="payOnline" class="pay-option" onclick="selectPayment('Online')" style="flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 8px; cursor: pointer; text-align: center; transition: all 0.3s;">
+                            <span style="font-size: 1.5rem; display: block;">💳</span>
+                            <strong>Online Payment</strong>
+                        </div>
+                    </div>
+                    <input type="hidden" id="paymentMethod" value="Cash">
+                </div>
+
+                <style>
+                    .pay-option.active {
+                        background: #e3f2fd;
+                        border-color: #0077b6 !important;
+                    }
+                    .pay-option:hover {
+                        border-color: #0077b6;
+                    }
+                </style>
+
+                <script>
+                    function selectPayment(method) {
+                        document.getElementById('paymentMethod').value = method;
+                        document.querySelectorAll('.pay-option').forEach(el => el.classList.remove('active'));
+                        if(method === 'Cash') {
+                            document.getElementById('payCash').classList.add('active');
+                            document.getElementById('payOnline').style.borderColor = '#ddd';
+                        } else {
+                            document.getElementById('payOnline').classList.add('active');
+                            document.getElementById('payCash').style.borderColor = '#ddd';
+                        }
+                    }
+                </script>
+
+                <button type="submit" class="btn-book" id="bookBtn">Book Now</button>
+            </form>
+        </div>
+
+        <div class="my-bookings">
+            <h2>My Dashboard</h2>
+            
+            <h3>My Bookings</h3>
+            <div id="bookingsList">
+                <p>Loading bookings...</p>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #0077b6;">My Enquiries</h3>
+            <div id="enquiriesList">
+                <p>Loading enquiries...</p>
+            </div>
+
+            <h3 style="margin-top: 30px; color: #0077b6;">My Favorites</h3>
+            <div id="favoritesList">
+                <p>Loading favorites...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const API_URL = "http://localhost:8000";
+
+    // Check if user is logged in
+    $(document).ready(function() {
+        const username = localStorage.getItem("username");
+        const email = localStorage.getItem("email");
+
+        if (!username) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        $("#userName").text(username);
+        $("#userEmail").text(`(${email})`);
+
+        // Handle pre-selected destination from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const dest = urlParams.get('destination');
+        if (dest) {
+            $("#destination").val(dest);
+        }
+
+        loadBookings();
+        loadFavorites();
+    });
+
+    $("#bookingForm").on("submit", async function(e) {
+        e.preventDefault();
+
+        const username = localStorage.getItem("username");
+        const email = localStorage.getItem("email");
+        const messageDiv = $("#message");
+        const paymentMethod = $("#paymentMethod").val();
+        const packageType = $("#packageType").val();
+        
+        // Map package types to amounts
+        const priceMap = { "Budget": 5000, "Standard": 10000, "Premium": 20000, "VIP": 50000 };
+        const amount = priceMap[packageType];
+
+        const bookingData = {
+            destination: $("#destination").val(),
+            start_date: $("#startDate").val(),
+            end_date: $("#endDate").val(),
+            num_people: parseInt($("#numPeople").val()),
+            package_type: packageType,
+            username: username,
+            payment_method: paymentMethod
+        };
+
+        if (paymentMethod === "Cash") {
+            submitBooking(bookingData);
+        } else {
+            // Razorpay Payment Flow
+            try {
+                // 1. Create Order in Backend
+                console.log("Creating order for amount:", amount);
+                const orderResponse = await fetch(`${API_URL}/create-order`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amount })
+                });
+                
+                if (!orderResponse.ok) {
+                    const errorData = await orderResponse.json();
+                    alert("Error creating order: " + (errorData.detail || "Unknown error"));
+                    return;
+                }
+                
+                const order = await orderResponse.json();
+                console.log("Order created:", order);
+
+                // 2. Open Razorpay Checkout
+                const options = {
+                    key: "rzp_test_SlArpAeb3Nrchv",
+                    amount: order.amount,
+                    currency: order.currency,
+                    name: "Sneha Travel Explore",
+                    description: `Booking for ${bookingData.destination}`,
+                    order_id: order.id,
+                    handler: async function (response) {
+                        console.log("Payment response received:", response);
+                        // 3. Verify Payment
+                        const verifyResponse = await fetch(`${API_URL}/verify-payment`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(response)
+                        });
+                        
+                        if (verifyResponse.ok) {
+                            bookingData.payment_id = response.razorpay_payment_id;
+                            submitBooking(bookingData);
+                        } else {
+                            const errorData = await verifyResponse.json();
+                            alert("Payment verification failed: " + (errorData.detail || "Invalid signature"));
+                        }
+                    },
+                    prefill: {
+                        name: username,
+                        email: email
+                    },
+                    theme: { color: "#0077b6" },
+                    modal: {
+                        ondismiss: function() {
+                            alert("Payment cancelled by user.");
+                        }
+                    }
+                };
+                const rzp = new Razorpay(options);
+                rzp.open();
+            } catch (err) {
+                console.error("Payment error:", err);
+                alert("Connection error: Make sure the backend server is running on " + API_URL);
+            }
+        }
+    });
+
+    function submitBooking(booking) {
+        const messageDiv = $("#message");
+        $.ajax({
+            url: `${API_URL}/book`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(booking),
+            success: function(data) {
+                messageDiv.text(booking.payment_method === "Online" ? "Booking confirmed with payment!" : "Booking requested (Cash on Arrival).");
+                messageDiv.removeClass("error").addClass("message success").show();
+                $("#bookingForm")[0].reset();
+                loadBookings();
+                setTimeout(() => messageDiv.hide(), 5000);
+            },
+            error: function(xhr) {
+                const data = xhr.responseJSON || {};
+                messageDiv.text(data.detail || "Booking failed");
+                messageDiv.removeClass("success").addClass("message error").show();
+            }
+        });
+    }
+
+    function loadBookings() {
+        const username = localStorage.getItem("username");
+        const bookingsList = $("#bookingsList");
+        const enquiriesList = $("#enquiriesList");
+
+        // Helper to determine category
+        const getCategory = (dest) => {
+            const intl = ["Dubai", "Paris", "Bali", "Singapore", "Maldives", "Switzerland", "London", "New York", "Tokyo", "Sydney", "Rome", "Bangkok", "Cape Town", "Santorini", "Cairo", "Istanbul"];
+            return intl.includes(dest) ? "International" : "National";
+        };
+
+        const getPrice = (type) => {
+            const prices = { "Budget": "$500", "Standard": "$1000", "Premium": "$2000", "VIP": "$5000" };
+            return prices[type] || "N/A";
+        };
+
+        $.ajax({
+            url: `${API_URL}/bookings/${username}`,
+            type: "GET",
+            success: function(data) {
+                // Render Bookings
+                if (data.bookings && data.bookings.length > 0) {
+                    const html = data.bookings.map(booking => {
+                        const category = getCategory(booking.destination);
+                        const price = getPrice(booking.package_type);
+                        return `
+                            <div class="booking-card" style="border-left-color: ${category === 'International' ? '#ff5722' : '#0077b6'};">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <h4>${booking.destination}</h4>
+                                    <span style="font-size: 0.7rem; background: ${category === 'International' ? '#ff5722' : '#0077b6'}; color: white; padding: 2px 8px; border-radius: 10px;">${category}</span>
+                                </div>
+                                <div class="booking-details">
+                                    <p><strong>Booking ID:</strong> #${booking.id}</p>
+                                    <p><strong>Travel Dates:</strong> ${booking.start_date} to ${booking.end_date}</p>
+                                    <p><strong>Travelers:</strong> ${booking.num_people} Person(s)</p>
+                                    <p><strong>Package Type:</strong> ${booking.package_type} (${price})</p>
+                                    <p><strong>Payment Method:</strong> ${booking.payment_method}</p>
+                                    <p><strong>Booking Status:</strong> <span style="font-weight: bold; color: ${booking.status === 'confirmed' ? '#28a745' : '#dc3545'}">${booking.status.toUpperCase()}</span></p>
+                                    <p style="font-size: 0.8rem; color: #888; margin-top: 5px;">Booked on: ${new Date(booking.created_at).toLocaleDateString()}</p>
+                                </div>
+                                <button class="btn-delete" onclick="deleteBooking('${booking.id}')">Cancel & Delete Record</button>
+                            </div>
+                        `;
+                    }).join("");
+                    bookingsList.html(html);
+                } else {
+                    bookingsList.html("<p>No bookings yet.</p>");
+                }
+                
+                // Render Enquiries
+                if (data.enquiries && data.enquiries.length > 0) {
+                    const eHtml = data.enquiries.map(enquiry => `
+                        <div class="booking-card" style="border-left-color: #ff9800;">
+                            <h4>Enquiry: ${enquiry.place}</h4>
+                            <div class="booking-details">
+                                <p><strong>Requested Package:</strong> ${enquiry.tripPackage}</p>
+                                <p><strong>Your Message:</strong> ${enquiry.message}</p>
+                                <p><strong>Inquiry Status:</strong> <span style="font-weight: bold; color: #ff9800;">${enquiry.status.toUpperCase()}</span></p>
+                                <p><small>Submitted on: ${new Date(enquiry.created_at).toLocaleDateString()}</small></p>
+                            </div>
+                            <button class="btn-delete" onclick="deleteEnquiry('${enquiry.id}')">Remove Enquiry</button>
+                        </div>
+                    `).join("");
+                    enquiriesList.html(eHtml);
+                } else {
+                    enquiriesList.html("<p>No enquiries yet.</p>");
+                }
+            },
+            error: function(xhr) {
+                bookingsList.html("<p>Error loading dashboard</p>");
+                enquiriesList.html("<p>Error loading dashboard</p>");
+                console.error("Error:", xhr);
+            }
+        });
+    }
+
+    function loadFavorites() {
+        const username = localStorage.getItem("username");
+        const favoritesList = $("#favoritesList");
+
+        $.ajax({
+            url: `${API_URL}/favorites/${username}`,
+            type: "GET",
+            success: function(data) {
+                if (data.favorites && data.favorites.length > 0) {
+                    const html = data.favorites.map(dest => `
+                        <div class="booking-card" style="border-left-color: #ff4757; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h4 style="margin-bottom: 5px;">${dest}</h4>
+                                <p style="font-size: 0.8rem; color: #666;">Saved to wishlist</p>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-book" style="padding: 8px 12px; width: auto; font-size: 0.8rem;" onclick="window.location.href='booking.html?destination=${dest}'">Book</button>
+                                <button class="btn-delete" style="padding: 8px 12px; margin-top: 0; font-size: 0.8rem;" onclick="removeFavorite('${dest}')">Remove</button>
+                            </div>
+                        </div>
+                    `).join("");
+                    favoritesList.html(html);
+                } else {
+                    favoritesList.html("<p>No favorites yet.</p>");
+                }
+            },
+            error: function(xhr) {
+                favoritesList.html("<p>Error loading favorites</p>");
+                console.error("Error:", xhr);
+            }
+        });
+    }
+
+    function removeFavorite(destination) {
+        const username = localStorage.getItem("username");
+        $.ajax({
+            url: `${API_URL}/favorite-remove`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username, destination }),
+            success: function() {
+                loadFavorites();
+            },
+            error: function(xhr) {
+                alert("Error removing favorite");
+                console.error("Error:", xhr);
+            }
+        });
+    }
+
+    function deleteBooking(bookingId) {
+        if (confirm("Are you sure you want to delete this booking record?")) {
+            $.ajax({
+                url: `${API_URL}/booking/${bookingId}`,
+                type: "DELETE",
+                success: function(data) {
+                    loadBookings();
+                    alert("Booking deleted successfully");
+                },
+                error: function(xhr) {
+                    alert("Error deleting booking");
+                    console.error("Error:", xhr);
+                }
+            });
+        }
+    }
+
+    function deleteEnquiry(enquiryId) {
+        if (confirm("Are you sure you want to remove this enquiry?")) {
+            $.ajax({
+                url: `${API_URL}/enquiry/${enquiryId}`,
+                type: "DELETE",
+                success: function(data) {
+                    loadBookings();
+                    alert("Enquiry removed successfully");
+                },
+                error: function(xhr) {
+                    alert("Error removing enquiry");
+                    console.error("Error:", xhr);
+                }
+            });
+        }
+    }
+
+    function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+            localStorage.removeItem("username");
+            localStorage.removeItem("email");
+            window.location.href = "index.html";
+        }
+    }
+</script>
+
+</body>
+</html>
