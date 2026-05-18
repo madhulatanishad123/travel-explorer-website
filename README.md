@@ -1,4 +1,4 @@
-# Sneha Travel Explore - Execution Guide
+#  Travel Explore - Execution Guide
 
 Follow these steps to run the project locally.
 
